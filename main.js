@@ -27,14 +27,35 @@ class UI {
     const row = document.createElement("tr");
     row.innerHTML = `
     <td>${book.title}</td>
-    <td>${book.auhor}</td>
+    <td>${book.author}</td>
     <td>${book.isbn}</td>
     <td><a href="#" class="btn btn-danger btn-sm delete">x</a></td>
     `;
     list.appendChild(row);
   }
+  static clearFilds() {
+    document.getElementById("title").value = "";
+    document.getElementById("author").value = "";
+    document.getElementById("isbn").value = "";
+  }
 }
 
-// on mounting the dom
+// event on mounting the dom
 
 document.addEventListener("DOMContentLoaded", UI.dispalyBooks);
+
+document.getElementById("book-form").addEventListener("submit", e => {
+  // prev
+  e.preventDefault();
+  //prev
+
+  const title = document.getElementById("title").value;
+  const author = document.getElementById("author").value;
+  const isbn = document.getElementById("isbn").value;
+  const book = new Book(title, author, isbn);
+  console.log(book);
+  UI.addBookToList(book);
+  UI.clearFilds();
+
+  // return book;
+});
