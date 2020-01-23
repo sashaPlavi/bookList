@@ -7,19 +7,7 @@ class Book {
 }
 class UI {
   static dispalyBooks() {
-    const storedBookd = [
-      {
-        title: "roman o Londonu",
-        author: "Milos Crnjanski",
-        isbn: "049583"
-      },
-      {
-        title: "roman o Londonu 2",
-        author: "Milos Crnjanski",
-        isbn: "049585"
-      }
-    ];
-    const books = storedBookd;
+    const books = Store.getBooks();
     books.forEach(book => UI.addBookToList(book));
   }
   static addBookToList(book) {
@@ -35,7 +23,7 @@ class UI {
   }
   static deleteBook(el) {
     if (el.classList.contains("delete")) {
-      console.log(el.classList);
+      // console.log(el.classList);
 
       el.parentElement.parentElement.remove();
     }
@@ -58,6 +46,31 @@ class UI {
   }
 }
 
+class Store {
+  static getBooks() {
+    let books = [];
+    if (localStorage.getItem("books") !== null) {
+      books = JSON.parse(localStorage.getItem("books"));
+    }
+
+    return books;
+  }
+  static addBook(book) {
+    const books = Store.getBooks();
+    books.push(book);
+    localStorage.setItem("books", JSON.stringify(books));
+  }
+  static removeBook(isbn) {
+    const books = Store.getBooks();
+    books.forEach((book, ind) => {
+      if (book.isbn === isbn) {
+        books.splice(ind, 1);
+      }
+    });
+    localStorage.setItem("books", JSON.stringify(books));
+  }
+}
+
 // event on mounting the dom
 
 document.addEventListener("DOMContentLoaded", UI.dispalyBooks);
@@ -70,19 +83,26 @@ document.getElementById("book-form").addEventListener("submit", e => {
   const title = document.getElementById("title").value;
   const author = document.getElementById("author").value;
   const isbn = document.getElementById("isbn").value;
-  if (title === "" || author === "" || isbn === "") {
+  if (title !== "" && author !== "" && isbn !== "") {
+    const book = new Book(title, author, isbn);
+    //console.log(book);
+    UI.addBookToList(book);
+    //
+    Store.addBook(book);
+    UI.showAlert("Book Added", "success");
+    UI.clearFilds();
+  } else {
     UI.showAlert("Please fill in all fields", "danger");
   }
-  const book = new Book(title, author, isbn);
-  console.log(book);
-  UI.addBookToList(book);
-  UI.showAlert("Book Added", "success");
-  UI.clearFilds();
-
-  // return book;
 });
+console.log(window.localStorage.books);
 
 document.getElementById("book-list").addEventListener("click", e => {
   UI.deleteBook(e.target);
+  //
+
+  console.log(e.target.parentElement.previousElementSibling.textContent);
+
+  Store.removeBook(e.target.parentElement.previousElementSibling.textContent);
   UI.showAlert("Book Deleted", "success");
 });
